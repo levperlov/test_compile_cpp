@@ -14,13 +14,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install vcpkg
+      - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
         with:
-          vcpkgArguments: 'nlohmann-json:x64-windows'
           vcpkgDirectory: '${{ runner.temp }}/vcpkg'
-          vcpkgTriplet: 'x64-windows'
-          appendVcpkgToPath: true
+          runVcpkgInstall: true
 
       - name: Configure CMake
         run: >
