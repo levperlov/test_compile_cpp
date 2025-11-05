@@ -44,20 +44,14 @@ jobs:
           name: executables
           path: release/*.exe
 
-      - name: Create GitHub Release
-        id: create_release
+      - name: Create or update GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: Release ${{ github.ref_name }}
-          tag_name: ${{ github.ref_name }}
+          tag_name: auto-main
+          name: "Automated Build - Main"
+          files: release/*.exe
           draft: false
           prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload executables to Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: release/*.exe
+          overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
