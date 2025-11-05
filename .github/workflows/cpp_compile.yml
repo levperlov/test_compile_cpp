@@ -1,0 +1,39 @@
+name: Build Project (C++20 + vcpkg)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgArguments: 'nlohmann-json:x64-windows'
+          vcpkgDirectory: '${{ runner.temp }}/vcpkg'
+          vcpkgTriplet: 'x64-windows'
+          appendVcpkgToPath: true
+
+      - name: Configure CMake
+        run: >
+          cmake -B build -S . 
+          -DCMAKE_TOOLCHAIN_FILE=${{ runner.temp }}/vcpkg/scripts/buildsystems/vcpkg.cmake 
+          -DCMAKE_CXX_STANDARD=20 
+          -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Project_manager_exe
+          path: build/Release/*.exe
