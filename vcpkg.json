@@ -4,5 +4,5 @@
   "dependencies": [
     "nlohmann-json"
   ],
-  "builtin-baseline": "1b74e47a47cb234b49a0cbef70b61ed0fa38f0ac"
+  "builtin-baseline": "17ff26d0566ba0fa05e35c9209e92664adb304e3"
 }
