@@ -1,0 +1,8 @@
+{
+  "name": "project-manager",
+  "version-string": "1.0.0",
+  "dependencies": [
+    "nlohmann-json"
+  ],
+  "builtin-baseline": "1b74e47a47cb234b49a0cbef70b61ed0fa38f0ac"
+}
