@@ -33,5 +33,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Project_manager_exe
-          path: build/Release/*.exe
+          name: all_executables
+          path: build/**/*.exe
