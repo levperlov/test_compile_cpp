@@ -36,25 +36,28 @@ jobs:
       - name: Build
         run: cmake --build build --config Release
 
-      - name: Prepare artifacts (Windows)
+      - name: Prepare and archive (Windows)
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path release
+          mkdir release
           Get-ChildItem -Path build/Release -Filter *.exe | Copy-Item -Destination release
+          Compress-Archive -Path release\* -DestinationPath windows-binaries.zip
 
-      - name: Prepare artifacts (Linux)
+      - name: Prepare and archive (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
           mkdir -p release
           find build -maxdepth 1 -type f -executable -exec cp {} release/ \;
+          tar -czvf linux-binaries.tar.gz -C release .
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: executables-${{ matrix.os }}
-          path: release/*
-
+          name: archive-${{ matrix.os }}
+          path: |
+            *.zip
+            *.tar.gz
 
   release:
     name: Upload Release
@@ -62,16 +65,16 @@ jobs:
     needs: build
 
     steps:
-      - name: Download Windows artifacts
+      - name: Download Windows archive
         uses: actions/download-artifact@v4
         with:
-          name: executables-windows-latest
+          name: archive-windows-latest
           path: release
 
-      - name: Download Linux artifacts
+      - name: Download Linux archive
         uses: actions/download-artifact@v4
         with:
-          name: executables-ubuntu-latest
+          name: archive-ubuntu-latest
           path: release
 
       - name: List release contents
@@ -82,7 +85,9 @@ jobs:
         with:
           tag_name: auto-main
           name: "Automated Build - Main"
-          files: release/*
+          files: |
+            release/windows-binaries.zip
+            release/linux-binaries.tar.gz
           draft: false
           prerelease: false
           overwrite: true
