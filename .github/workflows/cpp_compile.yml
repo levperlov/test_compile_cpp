@@ -36,11 +36,12 @@ jobs:
       - name: Build
         run: cmake --build build --config Release
 
-      - name: Prepare artifacts
+      - name: Prepare artifacts (Windows)
         if: matrix.os == 'windows-latest'
+        shell: pwsh
         run: |
-          mkdir release
-          copy build\Release\*.exe release\
+          New-Item -ItemType Directory -Force -Path release
+          Get-ChildItem -Path build/Release -Filter *.exe | Copy-Item -Destination release
 
       - name: Prepare artifacts (Linux)
         if: matrix.os == 'ubuntu-latest'
@@ -48,19 +49,40 @@ jobs:
           mkdir -p release
           find build -maxdepth 1 -type f -executable -exec cp {} release/ \;
 
-      - name: Upload build artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: executables-${{ matrix.os }}
           path: release/*
 
-      - name: Create or update GitHub Release (Windows only)
-        if: matrix.os == 'windows-latest'
+
+  release:
+    name: Upload Release
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Download Windows artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: executables-windows-latest
+          path: release
+
+      - name: Download Linux artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: executables-ubuntu-latest
+          path: release
+
+      - name: List release contents
+        run: ls -lh release
+
+      - name: Create or update GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: auto-main
           name: "Automated Build - Main"
-          files: release/*.exe
+          files: release/*
           draft: false
           prerelease: false
           overwrite: true
