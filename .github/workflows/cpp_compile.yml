@@ -46,7 +46,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           mkdir -p release
-          cp build/* release/ || true
+          find build -maxdepth 1 -type f -executable -exec cp {} release/ \;
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
