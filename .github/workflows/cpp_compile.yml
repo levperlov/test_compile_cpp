@@ -5,13 +5,16 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
-    
+
 permissions:
-  contents: write 
+  contents: write
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
 
     steps:
       - name: Checkout repository
@@ -34,17 +37,25 @@ jobs:
         run: cmake --build build --config Release
 
       - name: Prepare artifacts
+        if: matrix.os == 'windows-latest'
         run: |
           mkdir release
           copy build\Release\*.exe release\
 
+      - name: Prepare artifacts (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          mkdir -p release
+          cp build/* release/ || true
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: executables
-          path: release/*.exe
+          name: executables-${{ matrix.os }}
+          path: release/*
 
-      - name: Create or update GitHub Release
+      - name: Create or update GitHub Release (Windows only)
+        if: matrix.os == 'windows-latest'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: auto-main
