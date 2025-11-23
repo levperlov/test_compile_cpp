@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(Project_manager Project_manager/main.cpp)
 add_executable(Quartus_compiler Quartus_compiler/main.cpp)
+add_executable(Broker Broker/Broker.cpp)
 
 find_package(nlohmann_json CONFIG REQUIRED)
 target_link_libraries(Project_manager PRIVATE nlohmann_json::nlohmann_json)
