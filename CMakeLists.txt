@@ -12,4 +12,4 @@ add_executable(Broker Broker/Broker.cpp)
 
 find_package(nlohmann_json CONFIG REQUIRED)
 target_link_libraries(Project_manager PRIVATE nlohmann_json::nlohmann_json)
-
+target_link_libraries(Broker PRIVATE nlohmann_json::nlohmann_json)
